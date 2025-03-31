@@ -6,11 +6,46 @@ controller_manager:
     xarm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
+#    scaled_joint_trajectory_controller:
+#      type: joint_trajectory_controller/JointTrajectoryController
+
+#    joint_trajectory_controller:
+#      type: joint_trajectory_controller/JointTrajectoryController
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
 xarm_controller:
+  ros__parameters:
+    joints:
+      - arm1
+      - arm2
+      - arm3
+      - arm4
+      - arm5
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    allow_nonzero_velocity_at_trajectory_end: true
+
+scaled_joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - arm1
+      - arm2
+      - arm3
+      - arm4
+      - arm5
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    allow_nonzero_velocity_at_trajectory_end: true
+
+joint_trajectory_controller:
   ros__parameters:
     joints:
       - arm1

@@ -1,0 +1,7 @@
+<library path="xarm_controllers">
+  <class name="xarm_controllers/ScaledJointTrajectoryController" type="xarm_controllers::ScaledJointTrajectoryController" base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Scaled position-based joint trajectory controller.
+    </description>
+  </class>
+</library>
