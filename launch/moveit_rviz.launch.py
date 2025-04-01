@@ -3,5 +3,5 @@ from moveit_configs_utils.launches import generate_moveit_rviz_launch
 
 
 def generate_launch_description():
-    moveit_config = MoveItConfigsBuilder("xArm", package_name="xarm-moveit").to_moveit_configs()
+    moveit_config = MoveItConfigsBuilder("xArm", package_name="xarm_control").to_moveit_configs()
     return generate_moveit_rviz_launch(moveit_config)

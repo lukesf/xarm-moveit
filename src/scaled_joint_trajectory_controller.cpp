@@ -38,25 +38,34 @@
 #include <memory>
 #include <vector>
 
-#include "xarm_controllers/scaled_joint_trajectory_controller.hpp"
+#include "xarm_control/scaled_joint_trajectory_controller.hpp"
 
 #include "lifecycle_msgs/msg/state.hpp"
 
-namespace xarm_controllers
+namespace xarm_control
 {
 
 controller_interface::CallbackReturn ScaledJointTrajectoryController::on_init()
 {
+  RCLCPP_WARN(get_node()->get_logger(), "LUKE::on_init()");
   // Create the parameter listener and get the parameters
   scaled_param_listener_ = std::make_shared<scaled_joint_trajectory_controller::ParamListener>(get_node());
   scaled_params_ = scaled_param_listener_->get_params();
+  
   if (!scaled_params_.speed_scaling_interface_name.empty()) {
     RCLCPP_INFO(get_node()->get_logger(), "Using scaling state from the hardware from interface %s.",
                 scaled_params_.speed_scaling_interface_name.c_str());
   } else {
     RCLCPP_INFO(get_node()->get_logger(), "No scaling interface set. This controller will not use speed scaling.");
   }
-
+  
+  try {
+    move_js_publisher_ =
+        get_node()->create_publisher<sensor_msgs::msg::JointState>("lewansoul_xarm/move_js", rclcpp::SystemDefaultsQoS());
+  } catch (const std::exception& e) {
+    // get_node() may throw, logging raw here
+    fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
+  }
   return JointTrajectoryController::on_init();
 }
 
@@ -170,6 +179,7 @@ controller_interface::return_type ScaledJointTrajectoryController::update(const 
         current_trajectory_->set_point_before_trajectory_msg(traj_time, state_current_);
       }
     }
+    RCLCPP_WARN(get_node()->get_logger(), "LUKE::update()");
 
     // find segment for current timestamp
     joint_trajectory_controller::TrajectoryPointConstIter start_segment_itr, end_segment_itr;
@@ -275,6 +285,16 @@ controller_interface::return_type ScaledJointTrajectoryController::update(const 
         feedback->error = state_error_;
         active_goal->setFeedback(feedback);
 
+        // publish the joint state
+        auto msg = sensor_msgs::msg::JointState();
+        msg.header.stamp = time;
+        msg.name = params_.joints;
+        msg.position = state_desired_.positions;
+        msg.velocity = state_desired_.velocities;
+        msg.effort = state_desired_.effort;
+        move_js_publisher_->publish(msg);
+
+
         // check abort
         if (tolerance_violated_while_moving) {
           auto result = std::make_shared<FollowJTrajAction::Result>();
@@ -283,6 +303,7 @@ controller_interface::return_type ScaledJointTrajectoryController::update(const 
           // TODO(matthew-reynolds): Need a lock-free write here
           // See https://github.com/ros-controls/ros2_controllers/issues/168
           //LUKE: rt_active_goal_.writeFromNonRT(RealtimeGoalHandlePtr());
+          
           rt_has_pending_goal_.writeFromNonRT(false);
 
           RCLCPP_WARN(get_node()->get_logger(), "Aborted due to state tolerance violation");
@@ -297,6 +318,7 @@ controller_interface::return_type ScaledJointTrajectoryController::update(const 
             // TODO(matthew-reynolds): Need a lock-free write here
             // See https://github.com/ros-controls/ros2_controllers/issues/168
             //LUKE: rt_active_goal_.writeFromNonRT(RealtimeGoalHandlePtr());
+
             rt_has_pending_goal_.writeFromNonRT(false);
 
             RCLCPP_INFO(get_node()->get_logger(), "Goal reached, success!");
@@ -342,7 +364,7 @@ controller_interface::return_type ScaledJointTrajectoryController::update(const 
   return controller_interface::return_type::OK;
 }
 
-}  // namespace xarm_controllers
+}  // namespace xarm_control
 
 #include "pluginlib/class_list_macros.hpp"
-PLUGINLIB_EXPORT_CLASS(xarm_controllers::ScaledJointTrajectoryController, controller_interface::ControllerInterface)
+PLUGINLIB_EXPORT_CLASS(xarm_control::ScaledJointTrajectoryController, controller_interface::ControllerInterface)

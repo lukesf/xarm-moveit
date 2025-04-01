@@ -6,14 +6,12 @@ moveit_simple_controller_manager:
   controller_names:
     - xarm_controller
     - scaled_joint_trajectory_controller
-    - joint_trajectory_controller
-
-
+#    - joint_trajectory_controller
 
   xarm_controller:
     type: FollowJointTrajectory
     action_ns: follow_joint_trajectory
-    default: true
+    default: false
     joints:
       - arm1
       - arm2
@@ -24,7 +22,7 @@ moveit_simple_controller_manager:
   scaled_joint_trajectory_controller:
     action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
-    default: false
+    default: true
     joints:
       - arm1
       - arm2

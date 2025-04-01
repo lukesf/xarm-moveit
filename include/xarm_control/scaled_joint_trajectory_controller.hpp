@@ -45,9 +45,10 @@
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp/time.hpp"
 #include "rclcpp/duration.hpp"
-#include "xarm-moveit/scaled_joint_trajectory_controller_parameters.hpp"
+#include "xarm_control/scaled_joint_trajectory_controller_parameters.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 
-namespace xarm_controllers
+namespace xarm_control 
 {
 class ScaledJointTrajectoryController : public joint_trajectory_controller::JointTrajectoryController
 {
@@ -77,6 +78,7 @@ protected:
 private:
   double scaling_factor_{ 1.0 };
   realtime_tools::RealtimeBuffer<TimeData> time_data_;
+  std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::JointState>> move_js_publisher_;
 
   std::optional<std::reference_wrapper<hardware_interface::LoanedStateInterface>> scaling_state_interface_ =
       std::nullopt;
@@ -84,6 +86,6 @@ private:
   std::shared_ptr<scaled_joint_trajectory_controller::ParamListener> scaled_param_listener_;
   scaled_joint_trajectory_controller::Params scaled_params_;
 };
-}  // namespace xarm_controllers
+}  // namespace xarm_control
 
 #endif  // XARM_CONTROLLERS__SCALED_JOINT_TRAJECTORY_CONTROLLER_HPP_

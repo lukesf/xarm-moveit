@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(xarm-moveit)
+project(xarm_control)
 
 find_package(ament_cmake REQUIRED)
 #find_package(lewansoul_xarm REQUIRED)
@@ -57,19 +57,26 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 include_directories(include)
 
 generate_parameter_library(
+  speed_scaling_state_broadcaster_parameters
+  src/speed_scaling_state_broadcaster_parameters.yaml
+)
+generate_parameter_library(
   scaled_joint_trajectory_controller_parameters
   src/scaled_joint_trajectory_controller_parameters.yaml
 )
 
 add_library(${PROJECT_NAME} SHARED
   src/scaled_joint_trajectory_controller.cpp
+  src/speed_scaling_state_broadcaster.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
   include
 )
 target_link_libraries(${PROJECT_NAME}
+  speed_scaling_state_broadcaster_parameters
   scaled_joint_trajectory_controller_parameters
+
 )
 
 ament_target_dependencies(${PROJECT_NAME}

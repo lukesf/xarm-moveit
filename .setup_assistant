@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: lewansoul_xarm
+    relative_path: urdf/xArm.urdf
+  srdf:
+    relative_path: config/xArm.srdf
+  package_settings:
+    author_name: Luke Fletcher
+    author_email: luke@fletcher.net.au
+    generated_timestamp: 1743372648
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
