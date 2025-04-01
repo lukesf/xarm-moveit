@@ -179,7 +179,7 @@ controller_interface::return_type ScaledJointTrajectoryController::update(const 
         current_trajectory_->set_point_before_trajectory_msg(traj_time, state_current_);
       }
     }
-    RCLCPP_WARN(get_node()->get_logger(), "LUKE::update()");
+    //RCLCPP_WARN(get_node()->get_logger(), "LUKE::update()");
 
     // find segment for current timestamp
     joint_trajectory_controller::TrajectoryPointConstIter start_segment_itr, end_segment_itr;
